@@ -5,40 +5,41 @@
  * 
  *
  */
-class jwt {
+class Jwt {
     
-    private $token  = 'n3Gw4Yc5fcbcp4f8';
-    private $secret = 'sSKUIwSLkS4b1FuDYEcVlIRRPME3e03z';
+    public $token;
+    public $secret;
     
     /**
-     * Base64urlEncode
-     * 
+     * Set Token
+     * @param string $token
      */
-    private function base64url_encode($data) {
-        $b64 = base64_encode($data);
-        if ($b64 === false) {
-            return false;
-        }
-        $url = strtr($b64, '+/', '-_');
-        return rtrim($url, '=');
+    public function setToken($token){
+        $this->token = $token;
     }
-    
+    /**
+     * Set Secret
+     * @param string $secret
+     */
+    public function setSecret($secret){
+        $this->secret = $secret;
+    }
     /**
      * Valid Token JWT
-     *
+     * @return boolean
      */
     public function validateJWT(){
         $jwt = $this->getBearerToken();
-        // split the token
+        // Split the token
         $tokenParts = explode('.', $jwt);
         $header = base64_decode($tokenParts[0]);
         $payload = base64_decode($tokenParts[1]);
         $signatureProvided = $tokenParts[2];
         
-        $base64UrlHeader = base64url_encode($header);
-        $base64UrlPayload = base64url_encode($payload);
-        $signature = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload, $this->secret, true);
-        $base64UrlSignature = base64url_encode($signature);
+        $base64UrlHeader = $this->base64url_encode($header);
+        $base64UrlPayload = $this->base64url_encode($payload);
+        $signature = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload, $this->secret, TRUE);
+        $base64UrlSignature = $this->base64url_encode($signature);
         
         $signatureValid = ($base64UrlSignature === $signatureProvided);
         //echo "Header:\n" . $header . "\n";
@@ -48,12 +49,10 @@ class jwt {
         } else {
             return FALSE;////The signature is NOT valid.
         }
-        
     }
-    
     /**
      * Get Token JWT
-     *
+     * @return string
      */
     public function generateJWT(){
         // RFC-defined structure
@@ -66,13 +65,13 @@ class jwt {
             "token" => $this->token
         ];
         // Encode Header
-        $base64UrlHeader = base64url_encode(json_encode($header));
+        $base64UrlHeader = $this->base64url_encode(json_encode($header));
         // Encode Payload
-        $base64UrlPayload = base64url_encode(json_encode($payload));
+        $base64UrlPayload = $this->base64url_encode(json_encode($payload));
         // Create Signature Hash
-        $signature = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload, $this->secret, true);
+        $signature = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload, $this->secret, TRUE);
         // Encode Signature to Base64Url String
-        $base64UrlSignature = base64url_encode($signature);
+        $base64UrlSignature = $this->base64url_encode($signature);
         // Create JWT
         $jwt2 = $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
         return $jwt2;
@@ -80,7 +79,7 @@ class jwt {
     
     /**
      * Get Header Authorization
-     *
+     * @return string Authorization
      */
     private function getAuthorizationHeader(){
         $headers = null;
@@ -101,10 +100,10 @@ class jwt {
     }
     /**
      * Get Access Token From Header
-     *
+     * @return string Bearer Token
      */
     private function getBearerToken() {
-        $headers = getAuthorizationHeader();
+        $headers = $this->getAuthorizationHeader();
         // HEADER: Get the access token from the header
         if (!empty($headers)) {
             $matches = array();
@@ -113,6 +112,18 @@ class jwt {
             }
         }
         return null;
+    }
+    /**
+     * Base64urlEncode
+     * @return string 
+     */
+    private function base64url_encode($data) {
+        $b64 = base64_encode($data);
+        if ($b64 === false) {
+            return false;
+        }
+        $url = strtr($b64, '+/', '-_');
+        return rtrim($url, '=');
     }
 }
 ?>
