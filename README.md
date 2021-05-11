@@ -10,7 +10,7 @@ Create and Validate Jwt PHP class.
 ##### Create Jwt PHP
 ```sh
 <?php 
-require_once 'Jwt.php';
+require_once 'jwt.php';
 
 $jwtphp = new Jwt();
 $jwtphp->setToken( 'Bmn0c8rQDJoGTibk' );//base64_encode(random_bytes(12))
@@ -24,7 +24,7 @@ var_dump( $token );
 ##### Validate Jwt PHP in Server
 ```sh
 <?php 
-require_once 'Jwt.php';
+require_once 'jwt.php';
 
 $jwtphp = new Jwt(); 
 $jwtphp->setSecret( 'yXWczx0LwgKInpMFfgh0gCYCA8EKbOnw' );
